@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping App</title>
+    <style>
+      .shopping-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+</head>
+
+<body>
+    <div style="margin-top: 50px;" class="ui container">
+        <h1 class="ui center aligned header">Shopping List App</h1>
+
+        <div style="display: flex;">
+          <form class="ui form" action="/add" method="post">
+            <div class="field">
+              <label>Shopping List</label>
+              <input type="text" name="title" placeholder="Enter List item..."><br>
+            </div>
+            <button class="ui blue button" type="submit">Add</button>
+          </form>          
+        </div>
+        <hr>
+
+      {% for item in item_list %}
+      <div class="ui three column grid" style="display: flex;">
+        
+        {% if item.complete == False %}
+        <div class="column">
+          <a class="ui gray button" href="/update/{{ item.id }}"><i class="square outline icon"></i></a>
+        </div>
+        <div class="column">
+          <p class="ui big header">{{ item.title }}</p>
+          </div>
+          {% else %}
+        <div class="column">
+         <a class="ui green button" href="/update/{{ item.id }}"><i class="checkmark icon"></i></a>
+         </div> 
+        <div class = "column">
+          <p class="ui big header" style="color:grey; text-decoration: line-through;" >{{ item.title }}</p>
+        </div>
+        {% endif %}
+        <div class="column">
+          <a class="ui red button" href="/delete/{{ item.id }}">x</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+</body>
+
+</html>
