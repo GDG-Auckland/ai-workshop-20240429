@@ -31,6 +31,11 @@
         </div>
         <hr>
 
+        <form method=POST enctype=multipart/form-data action="/upload">
+            <input type=file name=photo>
+            <button class="ui blue button" type="submit">Add</button>
+          </form>
+
       {% for item in item_list %}
       <div class="ui three column grid" style="display: flex;">
         
