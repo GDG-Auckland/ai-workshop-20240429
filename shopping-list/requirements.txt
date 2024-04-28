@@ -1,1 +1,4 @@
 flask
+google-generativeai
+pillow
+python-dotenv
