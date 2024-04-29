@@ -9,5 +9,5 @@ pip install -r requirements.txt
 e.g. `export GEMINI_API_KEY='xxxxxxxxxxxxxxxxx'`
 - Run the application with the command (while in the `quiz` folder):
 ```
-streamlit run main.py
+streamlit run Quizzes.py
 ```

@@ -1,9 +1,12 @@
+import PIL.Image
 import streamlit as st
 import pandas as pd
 import os
-import google.generativeai as genai 
+import google.generativeai as genai
+import PIL
+import base64
 
-st.set_page_config(page_title="Quizzes (Static)", layout = "wide")
+st.set_page_config(layout = "wide")
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 #Initialise some state variables
@@ -28,24 +31,24 @@ def check_a():
     pass
 
 def check_answer(current_quiz):
+    if st.session_state["input_answer"] is None:
+        return
     explanation=""
-    input_answer = st.session_state["input_answer"]
-    if st.session_state["is_use_gemini"]:
-        # model = genai.GenerativeModel('gemini-pro')
-        model = genai.GenerativeModel(st.session_state["model_selector"])
-        prompt = (
-            "What is the accuracy of the given answer to the given question?" +
-            " Question: " + current_quiz["question"] +
-            " Answer: " + input_answer + 
-            " Always start the response with '{score}/10', and on a new line explain the answer."
-        )
-        response = model.generate_content(prompt)
-        explanation = response.text
-        score = int((response.text.split("\n")[0]).split("/")[0])
-        is_correct = score>=8
-    else:
-        # If not using Gemini, perform a static check
-        is_correct = input_answer.lower() == current_quiz["answer"].lower()
+    input_image_bytes = st.session_state["input_answer"]
+    model = genai.GenerativeModel(st.session_state["model_selector"])
+    prompt = (
+        "Examine the image, and tell me how accurate it is as an answer to the given question.\n" +
+        "Always start the response with '{score}/10', explain the answer afterwards.\n" +
+        "Question: " + current_quiz["question"] + "\n" +
+        "Answer: "
+    )
+    st.info(prompt, icon="🤖")
+    image = PIL.Image.open(input_image_bytes)
+    response = model.generate_content([prompt, image])
+
+    explanation = response.text
+    score = int((response.text.split("\n")[0]).split("/")[0])
+    is_correct = score>=8
 
     st.session_state["quiz_history"] = pd.concat([
             st.session_state["quiz_history"],
@@ -53,18 +56,16 @@ def check_answer(current_quiz):
                 [{
                     "question" : current_quiz["question"],
                     "correct_answer" : current_quiz["answer"],
-                    "user_answer" : input_answer,
+                    "user_answer" : f"data:image/png;base64,{base64.b64encode(st.session_state['input_answer'].getvalue()).decode()}",
                     "is_correct" : is_correct
                 }]
             )],
             ignore_index=True
         )
     if is_correct:
-        st.success( explanation if explanation else "Correct!", icon="✅")
+        st.success(explanation if explanation else "Correct!", icon="✅")
     else:
         st.error(explanation if explanation else "Incorrect!", icon="❌")
-    # if explanation:
-    #     st.text(explanation)
     st.session_state["quiz_counter"] = st.session_state["quiz_counter"] + 1
 
 def main():
@@ -72,18 +73,15 @@ def main():
     quiz_index = st.session_state["quiz_counter"] % len(quiz_df)
     current_quiz = quiz_df.iloc[quiz_index]
 
-    st.title("Quizzes v1!")
+    st.title("Quizzes!")
     st.header("This page provides you a list of static quizzes to answer!")
     st.divider()
-    is_use_gemini = st.checkbox("Use AI to check answer?", key="is_use_gemini")
-    if is_use_gemini:
-        models = [ x.name for x in genai.list_models()]
-        filtered_models = list(filter(lambda x: 'gemini' in x and 'vision' not in x, models))
-        # st.write(models)
-        st.selectbox("Model", filtered_models, key="model_selector")
+    models = [ x.name for x in genai.list_models()]
+    filtered_models = list(filter(lambda x: 'vision' in x, models))
+    st.selectbox("Model", filtered_models, key="model_selector")
     with st.form("quiz_form", clear_on_submit = True):
         st.subheader(current_quiz["question"])
-        st.text_input("Answer:", key="input_answer")
+        st.file_uploader("Answer:", key="input_answer")
         st.form_submit_button(label="Submit", on_click=check_answer, kwargs={"current_quiz": current_quiz})
         
     # Show the quiz history if it's not empty
@@ -93,7 +91,7 @@ def main():
             column_config = {
                 "question": "Question",
                 "correct_answer" : "Correct Answer",
-                "user_answer" : "Your Answer",
+                "user_answer" : st.column_config.ImageColumn("Your Answer"),
                 "is_correct" : "Correct?"
             }
         )
