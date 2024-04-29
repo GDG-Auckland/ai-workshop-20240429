@@ -4,7 +4,7 @@ import os
 import google.generativeai as genai 
 
 st.set_page_config(page_title="Quizzes", layout = "wide")
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+genai.configure(api_key="AIzaSyCOU1JKjlgCHW-Fe2reqEMyKhChydhHF-k")
 
 #Initialise some state variables
 if "quiz_history" not in st.session_state:

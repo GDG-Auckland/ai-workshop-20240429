@@ -7,7 +7,7 @@ import PIL
 import base64
 
 st.set_page_config(layout = "wide")
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+genai.configure(api_key="AIzaSyCOU1JKjlgCHW-Fe2reqEMyKhChydhHF-k")
 
 #Initialise some state variables
 if "quiz_history" not in st.session_state:
