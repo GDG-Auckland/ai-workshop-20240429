@@ -37,10 +37,7 @@ def check_answer(current_quiz):
     input_image_bytes = st.session_state["input_answer"]
     model = genai.GenerativeModel(st.session_state["model_selector"])
     prompt = (
-        "Examine the image, and tell me how accurate it is as an answer to the given question.\n" +
-        "Always start the response with '{score}/10', explain the answer afterwards.\n" +
-        "Question: " + current_quiz["question"] + "\n" +
-        "Answer: "
+        ""
     )
     st.info(prompt, icon="🤖")
     image = PIL.Image.open(input_image_bytes)

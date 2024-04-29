@@ -34,21 +34,7 @@ def check_answer(current_quiz):
         # model = genai.GenerativeModel('gemini-pro')
         model = genai.GenerativeModel(st.session_state["model_selector"])
         prompt = (
-            "What is the accuracy of the given answer to the given question.\n" +
-            "Always start the response with '{score}/10', explain the answer afterwards.\n" +
-            "When evaluating answers, ignore letter accents.\n" +
-            "Examples\n" +
-            "Question: What is the capital of New Zealand?\n" +
-            "Answer: Wellington\n" + 
-            "Response: 10/10\n" + 
-            "The answer is correct since Wellington is the capital of New Zealand!\n" +
-            "Question: What is the national bird of New Zealand?\n" +
-            "Answer: Kiwifruit\n" + 
-            "Response: 4/10\n" +
-            "The answer is not correct since kiwifruit is a fruit, and not a type of bird. The correct answer is kiwi.\n" +
-            "Question: " + current_quiz["question"] + "\n"
-            "Answer: " + input_answer + "\n"
-            "Response:"
+            ""
         )
         st.info(prompt, icon="🤖")
         response = model.generate_content(prompt)
